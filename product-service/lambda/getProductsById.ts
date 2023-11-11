@@ -1,5 +1,5 @@
 import { Handler } from 'aws-lambda';
-import { products } from '../data';
+import { products } from '../mocks/data';
 import { buildResponse } from './utils';
 
 export const productsIdHandler: Handler = async function(event) {

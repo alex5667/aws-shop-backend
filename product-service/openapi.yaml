@@ -1,0 +1,24 @@
+openapi: 3.0.0
+info:
+  title: "Products API"
+  version: "1.0"
+servers:
+- url: "https://4i65c6il40.execute-api.eu-west-1.amazonaws.com/dev/{basePath}"
+  variables:
+    basePath:
+      default: ""
+paths:
+  /products:
+    get:
+      summary: "Get a list of products"
+      operationId: "getProductsList"
+      responses:
+        "200":
+          description: "Successful response"
+  /products/{productId}:
+    get:
+      summary: "Get details of a product by ID"
+      operationId: "getProductsById"
+      responses:
+        "200":
+          description: "Successful response"

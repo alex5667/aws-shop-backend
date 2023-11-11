@@ -24,11 +24,11 @@ export class ProductServiceStack extends cdk.Stack {
       functionName: "getProductsList",
     });
 
-    const getProductsById = new NodejsFunction(this, 'getProductsById', {
+    const getProductsById = new NodejsFunction(this, "getProductsById", {
       ...nodeJsFunctionCommonSettings,
-      entry: path.join(__dirname,'../lambda/getProductsById.ts'),
-      handler: 'productsIdHandler',
-      functionName: 'getProductsById',
+      entry: path.join(__dirname, "../lambda/getProductsById.ts"),
+      handler: "productsIdHandler",
+      functionName: "getProductsById",
     });
 
     const httpApi = new apiGateway.HttpApi(this, "ProductsHttpApi", {
@@ -56,16 +56,15 @@ export class ProductServiceStack extends cdk.Stack {
       methods: [apiGateway.HttpMethod.GET],
       integration: getProductsListIntegration,
     });
-    const getProductsByIdIntegration = new HttpLambdaIntegration('productsByIdIntegration', getProductsById);
+    const getProductsByIdIntegration = new HttpLambdaIntegration(
+      "productsByIdIntegration",
+      getProductsById
+    );
 
-    httpApi.addRoutes(
-      {
-        path: '/products/{productId}',
-        methods: [apiGateway.HttpMethod.GET],
-        integration: getProductsByIdIntegration,
-      }
-    )
-
-    
+    httpApi.addRoutes({
+      path: "/products/{productId}",
+      methods: [apiGateway.HttpMethod.GET],
+      integration: getProductsByIdIntegration,
+    });
   }
 }
