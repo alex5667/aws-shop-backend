@@ -40,3 +40,17 @@ export const context: Context = {
 
 
 
+export const createEvent = (productId: string): APIGatewayProxyEvent => ({
+  body: null,
+  headers: {},
+  multiValueHeaders: {},
+  httpMethod: 'GET',
+  isBase64Encoded: false,
+  path: '',
+  pathParameters: { productId },
+  queryStringParameters: null,
+  multiValueQueryStringParameters: null,
+  stageVariables: null,
+  requestContext: {} as any,
+  resource: '',
+});

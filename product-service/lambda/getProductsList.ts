@@ -3,6 +3,7 @@ import { products } from '../mocks/data';
 import { buildResponse } from './utils';
 
 export const productsListHandler: Handler = async function(event) {
+  console.log(event);
   try {
     return buildResponse(200, products);
   } catch(err) {
