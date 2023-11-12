@@ -3,7 +3,7 @@ info:
   title: "Products API"
   version: "1.0"
 servers:
-- url: "https://4i65c6il40.execute-api.eu-west-1.amazonaws.com/dev/{basePath}"
+- url: "https://4i65c6il40.execute-api.eu-west-1.amazonaws.com/dev"
   variables:
     basePath:
       default: ""
