@@ -11,6 +11,7 @@ export const productsIdHandler: Handler = async function(event) {
       return  buildResponse(404, 'Product not found');
     }
 
+    
     return buildResponse(200, product);
   } catch(err) {
     return buildResponse(500, err);
