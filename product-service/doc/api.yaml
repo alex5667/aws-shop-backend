@@ -1,0 +1,121 @@
+openapi: 3.0.0
+info:
+  title: My Shop Backend
+  description: My Shop Backend server deployed to AWS
+  version: 1.0.0
+servers:
+  - url: https://7uxztr6cn6.execute-api.eu-west-1.amazonaws.com/
+tags:
+  - name: Products
+    description: Products service
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get all available products
+      description: Gets arrays of all available products
+      operationId: getProductsList
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailableProduct'
+    post:
+      tags:
+        - Products
+      summary: Create product
+      description: Creates product and returns created product
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                title:
+                  type: string
+                  example: The Pallbearer
+                description:
+                  type: string
+                  example: Comedy
+                price:
+                  type: number
+                  example: 72
+                count:
+                  type: number
+                  format: int64
+                  example: 1
+              required:
+                - title
+                - description
+                - price
+                - count
+      responses:
+        '201':
+          description: The product has been created
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/AvailableProduct'
+        '400':
+          description: Bad request. body does not contain required fields
+  /products/{productId}:
+    get:
+      tags:
+        - Product
+      summary: Get product by Id
+      description: Returns a single product
+      operationId: getProductsById
+      parameters:
+        - name: productId
+          in: path
+          description: Id of a product to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableProduct'
+        '404':
+          description: Product not found
+
+components:
+  schemas:
+    AvailableProduct:
+      required:
+        - id
+        - title
+        - description
+        - price
+        - count
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: '7149181e-699f-44c3-95db-c6134ae8a8b6'
+        title:
+          type: string
+          example: The Pallbearer
+        description:
+          type: string
+          example: Comedy
+        price:
+          type: number
+          example: 72
+        count:
+          type: number
+          format: int64
+          example: 1

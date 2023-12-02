@@ -1,14 +1,53 @@
-# Welcome to your CDK TypeScript project
+# Product service
 
-This is a blank project for CDK development with TypeScript.
+## Deploy links
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+> BE Product service: <https://7uxztr6cn6.execute-api.eu-west-1.amazonaws.com/products>
+>
+> FE application: <https://d2tbewbqvvmzls.cloudfront.net>
+>
+> SWAGGER: <https://app.swaggerhub.com/apis/Alexander-M-rss/my-shop_backend/1.0.0>
 
-## Useful commands
+Environment variables must be set in the `.env` file. You can see what variables are needed in `.env.example` file. In the root of the project you can find `createProduct.postman_collection.json` file for createProduct request.
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+## Available Scripts
+
+### `cdk:bootstrap`
+
+Makes CDK bootstrap.
+
+### `cdk:deploy`
+
+Deploys lambda functions to AWS.
+
+### `cdk:remove`
+
+Removes Product service infrastructure from AWS.
+
+### `test`
+
+Runs unit tests.
+
+### `lint`, `prettier`
+
+Runs linting and formatting for all files in `src` folder.
+
+## Available SQL Scripts
+
+They are located in `scripts` folder. You can use them with database management application such as `DBeaver`.
+
+### `create-tables.sql`
+
+Creates tables.
+
+### `seed-tables.sql`
+
+Seeding tables with data.
+
+### `clear-tables.sql`
+
+Clears the contents of the tables.
+
+### `delete-tables.sql`
+
+Deletes the tables with it contents.
