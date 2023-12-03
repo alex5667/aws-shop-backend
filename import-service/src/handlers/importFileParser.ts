@@ -9,6 +9,7 @@ import { S3Event } from 'aws-lambda';
 import csv from 'csv-parser';
 import { Dir } from './constants';
 
+
 export const handler = async (event: S3Event): Promise<void> => {
   try {
     const records = event.Records;
