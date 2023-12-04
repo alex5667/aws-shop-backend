@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: Product Service API
+  description: 'Product Service for [Elian-AWS-React-Shop](https://github.com/elian-cheng/nodejs-aws-shop-react).'
+  version: 1.0.0
+servers:
+  - url: https://d0jroimskb.execute-api.eu-west-1.amazonaws.com
+tags:
+  - name: Products
+    description: Product related endpoints
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get all products
+      description: Get an array of all available products
+      operationId: getProductsList
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '500':
+          description: Internal Server Error, default server error code
+    post:
+      tags:
+        - Products
+      summary: Create a product
+      description: Create a new product
+      operationId: createProduct
+      requestBody:
+        description: Product creation request
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductCreation'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Validation failed
+        '500':
+          description: Internal Server Error, default server error code
+  /products/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Get a product by productId
+      description: Returns a single product
+      operationId: getProductsById
+      parameters:
+        - name: productId
+          in: path
+          description: ID of the product
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Get product by productId
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error, default server error code
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '1'
+        title:
+          type: string
+          example: 'Lenovo IdeaPad L3'
+        description:
+          type: string
+          example: 'Powerful laptop with FHD display, stereo speakers, and long battery life. Ideal for work, school, and entertainment.'
+        price:
+          type: integer
+          example: 930
+        count:
+          type: integer
+          example: 10
+    ProductCreation:
+      title: 'ProductCreation'
+      type: 'object'
+      properties:
+        title:
+          type: 'string'
+          example: 'New Product'
+        description:
+          type: 'string'
+          example: 'Description of the new product.'
+        price:
+          type: 'integer'
+          example: 800
+        count:
+          type: 'integer'
+          example: 15

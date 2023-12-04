@@ -1,28 +1,48 @@
-import { getProductsById } from '../db/products';
-import { buildResponse } from './utils';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { validate } from 'uuid';
+import { sendResponse } from '../utils/helpers';
+import { getProductById } from '../lib/dbUtils';
+import { ErrorMessages, StatusCodes } from '../utils/constants';
+import { IStock } from '../utils/interfaces';
 
 export const handler = async (
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> => {
   try {
-    const id = event.pathParameters?.productId;
+    console.log(`lambda: getProductsById, event: ${JSON.stringify(event)}`);
 
-    console.log(`GET products/${id}`);
-
-    if (!id || !validate(id)) {
-      return buildResponse(404, 'Product not found');
+    const productId = event.pathParameters?.productId?.trim();
+    if (!productId) {
+      return sendResponse(StatusCodes.BAD_REQUEST, {
+        message: ErrorMessages.PRODUCT_ID_NOT_DEFINED,
+      });
     }
 
-    const product = await getProductsById(id);
+    const product = await getProductById(
+      'id',
+      productId,
+      process.env.PRODUCTS_TABLE_NAME!
+    );
 
     if (!product) {
-      return buildResponse(404, 'Product not found');
+      return sendResponse(StatusCodes.NOT_FOUND, {
+        message: ErrorMessages.PRODUCT_NOT_FOUND,
+      });
     }
 
-    return buildResponse(200, product);
-  } catch (error) {
-    return buildResponse(500, error);
+    const stock = (await getProductById(
+      'product_id',
+      productId,
+      process.env.STOCKS_TABLE_NAME!
+    )) as IStock | null;
+
+    const availableProduct = {
+      ...product,
+      count: stock?.count || 0,
+    };
+    return sendResponse(StatusCodes.OK, availableProduct);
+  } catch (e) {
+    return sendResponse(StatusCodes.INTERNAL_ERROR, {
+      message: ErrorMessages.INTERNAL_SERVER_ERROR,
+    });
   }
 };
