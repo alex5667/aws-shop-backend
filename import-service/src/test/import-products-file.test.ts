@@ -1,4 +1,4 @@
-import { handler } from '../handlers/importFileParser';
+import { handler } from '../handlers/import-products-file';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { APIGatewayProxyEvent } from 'aws-lambda';

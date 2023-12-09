@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "scripts": {
     "test": "jest",
-    "cdk:bootstrap": "npx cdk bootstrap",
+    "cdk:bootstrap": "npx cdk bootstrap --profile myprofile",
     "cdk:deploy": "npx cdk deploy --profile myprofile",
-    "cdk:remove": "npx cdk destroy",
+    "cdk:remove": "npx cdk destroy --profile myprofile",
     "lint": "eslint --ignore-path .gitignore --fix src",
     "prettier": "prettier src --write"
   },
@@ -28,10 +28,10 @@
     "typescript": "~5.0.4"
   },
   "dependencies": {
-    "@aws-cdk/core": "latest",
     "@aws-sdk/client-s3": "^3.354.0",
     "@aws-sdk/s3-request-presigner": "^3.354.0",
     "aws-cdk-lib": "^2.78.0",
+    "aws-sdk": "^2.1404.0",
     "constructs": "^10.0.0",
     "csv-parser": "^3.0.0",
     "source-map-support": "^0.5.21"

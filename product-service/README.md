@@ -8,7 +8,7 @@
 >
 > SWAGGER: <https://app.swaggerhub.com/apis/Alexander-M-rss/my-shop_backend/1.0.0>
 
-Environment variables must be set in the `.env` file. You can see what variables are needed in `.env.example` file. In the root of the project you can find `createProduct.postman_collection.json` file for createProduct request.
+Environment variables must be set in the `.env` file. You can see what variables are needed in `.env.example` file. In the root of the project you can find `create-product.postman_collection.json` file for createProduct request.
 
 ## Available Scripts
 

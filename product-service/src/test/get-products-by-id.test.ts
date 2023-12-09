@@ -1,5 +1,8 @@
-import { handler } from '../handlers/getProductsById';
+import { handler } from '../handlers/get-products-by-id';
 import { availableProducts } from '../mocks/data';
+import * as products from '../db/products';
+
+const getProductsByIdMock = jest.spyOn(products, 'getProductsById');
 
 describe('getProductsById', () => {
   const event = {
@@ -53,6 +56,7 @@ describe('getProductsById', () => {
     const product = availableProducts[availableProducts.length - 1];
 
     event.pathParameters.productId = product.id as string;
+    getProductsByIdMock.mockResolvedValueOnce(product);
 
     const result = await handler(event);
 
@@ -62,6 +66,7 @@ describe('getProductsById', () => {
 
   it('returns 404 if product is not found by Id', async () => {
     event.pathParameters.productId = 'non-exist-product-Id';
+    getProductsByIdMock.mockResolvedValueOnce(null);
 
     const result = await handler(event);
 

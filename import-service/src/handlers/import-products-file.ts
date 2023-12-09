@@ -14,7 +14,7 @@ export const handler = async (
   }
 
   const client = new S3Client({ region: process.env.IMPORT_AWS_REGION });
-  const BUCKET_NAME = process.env.BUCKET_NAME;
+  const BUCKET_NAME = process.env.BUCKET_NAME || 'test-bucket';
   const putObjCommand = new PutObjectCommand({
     Bucket: BUCKET_NAME,
     Key: `${Dir.UPLOADED}/${fileName}`,

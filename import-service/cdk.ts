@@ -6,13 +6,14 @@ import {
 } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
-import * as s3notifications from 'aws-cdk-lib/aws-s3-notifications';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import 'dotenv/config';
+import * as s3notifications from 'aws-cdk-lib/aws-s3-notifications';
 import { Dir } from './src/handlers/constants';
+import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 const BUCKET_NAME = process.env.BUCKET_NAME || '';
 const IMPORT_AWS_REGION = process.env.IMPORT_AWS_REGION || 'eu-west-1';
+const QUEUE_ARN = process.env.QUEUE_ARN || '';
 const API_PATH = 'import';
 const app = new cdk.App();
 const stack = new cdk.Stack(app, 'ImportServiceStack', {
@@ -20,20 +21,16 @@ const stack = new cdk.Stack(app, 'ImportServiceStack', {
     region: IMPORT_AWS_REGION,
   },
 });
-
-const lambdaRole = new iam.Role(stack, 'LambdaRole', {
-  assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
-});
-lambdaRole.addManagedPolicy(
-  iam.ManagedPolicy.fromAwsManagedPolicyName(
-    'service-role/AWSLambdaBasicExecutionRole',
-  ),
-);
-
 const bucket = new s3.Bucket(stack, 'MyShopImportBucket', {
   bucketName: BUCKET_NAME,
   removalPolicy: cdk.RemovalPolicy.DESTROY,
   autoDeleteObjects: true,
+  blockPublicAccess: new s3.BlockPublicAccess({
+    blockPublicAcls: true,
+    blockPublicPolicy: true,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: true,
+  }),
   cors: [
     {
       allowedHeaders: ['*'],
@@ -42,31 +39,35 @@ const bucket = new s3.Bucket(stack, 'MyShopImportBucket', {
     },
   ],
 });
-
-const lambdaCommonProps: Partial<NodejsFunctionProps> = {
+const catalogItemsQueue = sqs.Queue.fromQueueArn(
+  stack,
+  'CatalogItemsQueue',
+  QUEUE_ARN,
+);
+const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   runtime: lambda.Runtime.NODEJS_18_X,
   environment: {
     IMPORT_AWS_REGION,
     BUCKET_NAME,
+    QUEUE_URL: catalogItemsQueue.queueUrl,
   },
-  role: lambdaRole,
 };
-
 const importProductsFile = new NodejsFunction(
   stack,
   'ImportProductsFileLambda',
   {
-    ...lambdaCommonProps,
+    ...sharedLambdaProps,
     functionName: 'importProductsFile',
-    entry: 'src/handlers/importProductsFile.ts',
+    entry: 'src/handlers/import-products-file.ts',
   },
 );
-
 const importFileParser = new NodejsFunction(stack, 'ImportFileParserLambda', {
-  ...lambdaCommonProps,
+  ...sharedLambdaProps,
   functionName: 'importFileParser',
-  entry: 'src/handlers/importFileParser.ts',
+  entry: 'src/handlers/import-file-parser.ts',
 });
+
+catalogItemsQueue.grantSendMessages(importFileParser);
 
 const api = new apiGateway.RestApi(stack, 'ImportApi', {
   defaultCorsPreflightOptions: {
@@ -76,18 +77,14 @@ const api = new apiGateway.RestApi(stack, 'ImportApi', {
   },
 });
 
-bucket.grantReadWrite(lambdaRole);
-
+bucket.grantReadWrite(importProductsFile);
 api.root
   .addResource(API_PATH)
   .addMethod('GET', new apiGateway.LambdaIntegration(importProductsFile), {
     requestParameters: { 'method.request.querystring.name': true },
   });
-
-bucket.grantReadWrite(importProductsFile);
 bucket.grantReadWrite(importFileParser);
 bucket.grantDelete(importFileParser);
-
 bucket.addEventNotification(
   s3.EventType.OBJECT_CREATED,
   new s3notifications.LambdaDestination(importFileParser),

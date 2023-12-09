@@ -8,7 +8,9 @@ import { Readable } from 'stream';
 import { S3Event } from 'aws-lambda';
 import csv from 'csv-parser';
 import { Dir } from './constants';
+import * as AWS from 'aws-sdk';
 
+const IMPORT_AWS_REGION = process.env.IMPORT_AWS_REGION;
 
 export const handler = async (event: S3Event): Promise<void> => {
   try {
@@ -19,9 +21,11 @@ export const handler = async (event: S3Event): Promise<void> => {
     }
 
     const client = new S3Client({
-      region: process.env.IMPORT_AWS_REGION || '',
+      region: IMPORT_AWS_REGION,
     });
-    const BUCKET_NAME = process.env.BUCKET_NAME || '';
+    const BUCKET_NAME = process.env.BUCKET_NAME;
+    const sqs = new AWS.SQS({ region: IMPORT_AWS_REGION });
+    const queueUrl = process.env.QUEUE_URL || '';
 
     for (const record of records) {
       const file = await client.send(
@@ -37,7 +41,14 @@ export const handler = async (event: S3Event): Promise<void> => {
         await new Promise((res) => {
           data
             .pipe(csv())
-            .on('data', (data) => console.log(data))
+            .on('data', (data) => {
+              sqs
+                .sendMessage({
+                  QueueUrl: queueUrl,
+                  MessageBody: JSON.stringify(data),
+                })
+                .send((error) => console.error(error));
+            })
             .on('end', async () => {
               console.log('File has been read');
               await client.send(

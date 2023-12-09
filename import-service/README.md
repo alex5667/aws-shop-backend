@@ -1,5 +1,6 @@
 # Import service
 
+Environment variables must be set in the `.env` file. You can see what variables are needed in `.env.example` file.
 
 ## Available Scripts
 
@@ -19,3 +20,6 @@ Removes Product service infrastructure from AWS.
 
 Runs unit tests.
 
+### `lint`, `prettier`
+
+Runs linting and formatting for all files in `src` folder.
