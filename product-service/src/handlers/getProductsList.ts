@@ -1,19 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { sendResponse } from '../utils/helpers';
-import { getProductsList } from '../lib/dbUtils';
-import { ErrorMessages, StatusCodes } from '../utils/constants';
+import { getProductsList } from '../db/products';
+import { buildResponse } from './utils';
+import { APIGatewayProxyResult } from 'aws-lambda';
 
-export const handler = async (
-  event: APIGatewayProxyEvent
-): Promise<APIGatewayProxyResult> => {
-  console.log(`lambda: getProductsList, event: ${JSON.stringify(event)}`);
-
+export const handler = async (): Promise<APIGatewayProxyResult> => {
+  console.log(`GET /products`);
   try {
     const availableProducts = await getProductsList();
-    return sendResponse(StatusCodes.OK, availableProducts);
-  } catch (e) {
-    return sendResponse(StatusCodes.INTERNAL_ERROR, {
-      message: ErrorMessages.INTERNAL_SERVER_ERROR,
-    });
+
+    return buildResponse(200, availableProducts);
+  } catch (error) {
+    return buildResponse(500, error);
   }
 };

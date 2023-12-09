@@ -1,32 +1,31 @@
+import { createProduct } from '../db/products';
+import { AvailableProductSchema, CreateProductDTO } from '../models/products';
+import { buildResponse } from './utils';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { sendResponse } from '../utils/helpers';
-import ProductSchema from '../schemas/product';
-import { ErrorMessages, StatusCodes } from '../utils/constants';
-import { createProduct } from '../lib/dbUtils';
 
 export const handler = async (
-  event: APIGatewayProxyEvent
+  event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
-  console.log(`lambda: createProduct, event: ${JSON.stringify(event)}`);
+  let createProductDTO: CreateProductDTO;
 
+  console.log(`POST /products\n${event.body}`);
   try {
-    const body = JSON.parse(event.body || '{}');
-    const { value, error } = ProductSchema.validate(body, {
-      abortEarly: false,
+    createProductDTO = JSON.parse(event.body || '');
+  } catch {
+    return buildResponse(400, 'Incorrect product data');
+  }
+  try {
+    createProductDTO = await AvailableProductSchema.validate(createProductDTO, {
+      abortEarly: true,
     });
+  } catch (error) {
+    return buildResponse(400, error);
+  }
+  try {
+    const id = await createProduct(createProductDTO);
 
-    if (error) {
-      return sendResponse(StatusCodes.BAD_REQUEST, {
-        message: ErrorMessages.PRODUCT_CREATE_ERROR,
-      });
-    }
-
-    const createdProduct = await createProduct(value);
-
-    return sendResponse(StatusCodes.CREATED, createdProduct);
-  } catch (e) {
-    return sendResponse(StatusCodes.INTERNAL_ERROR, {
-      message: ErrorMessages.INTERNAL_SERVER_ERROR,
-    });
+    return buildResponse(201, { id, ...createProductDTO });
+  } catch (error) {
+    return buildResponse(500, error);
   }
 };
