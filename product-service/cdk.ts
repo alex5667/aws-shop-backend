@@ -23,7 +23,7 @@ const catalogItemsQueue = new sqs.Queue(stack, 'CatalogItemsQueue', {
   queueName: 'catalog-items-queue',
 });
 const createProductTopic = new sns.Topic(stack, 'CreateProductTopic', {
-  topicName: 'create-product-topic',
+  topicName: 'createProduct-topic',
 });
 const sharedLambdaProps: Partial<NodejsFunctionProps> = {
   runtime: lambda.Runtime.NODEJS_18_X,
@@ -51,17 +51,17 @@ const sharedLambdaProps: Partial<NodejsFunctionProps> = {
 const getProductsList = new NodejsFunction(stack, 'GetProductsListLambda', {
   ...sharedLambdaProps,
   functionName: 'getProductsList',
-  entry: 'src/handlers/get-products-list.ts',
+  entry: 'src/handlers/getProductsList.ts',
 });
 const getProductsById = new NodejsFunction(stack, 'GetProductsByIdLambda', {
   ...sharedLambdaProps,
   functionName: 'getProductsById',
-  entry: 'src/handlers/get-products-by-id.ts',
+  entry: 'src/handlers/getProductsById.ts',
 });
 const createProduct = new NodejsFunction(stack, 'CreateProductLambda', {
   ...sharedLambdaProps,
   functionName: 'createProduct',
-  entry: 'src/handlers/create-product.ts',
+  entry: 'src/handlers/createProduct.ts',
 });
 const catalogBatchProcess = new NodejsFunction(
   stack,
@@ -69,7 +69,7 @@ const catalogBatchProcess = new NodejsFunction(
   {
     ...sharedLambdaProps,
     functionName: 'catalogBatchProcess',
-    entry: 'src/handlers/catalog-batch-process.ts',
+    entry: 'src/handlers/catalogBatchProcess.ts',
   },
 );
 
@@ -84,7 +84,7 @@ new sns.Subscription(stack, 'PrimarySubscription', {
 });
 
 if (process.env.LOW_STOCK_EMAIL) {
-  new sns.Subscription(stack, 'LowStockSubscription', {
+  new sns.Subscription(stack, 'NewLowStockSubscription', {
     endpoint: process.env.LOW_STOCK_EMAIL,
     protocol: sns.SubscriptionProtocol.EMAIL,
     topic: createProductTopic,

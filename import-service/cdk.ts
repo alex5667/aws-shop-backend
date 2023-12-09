@@ -58,13 +58,13 @@ const importProductsFile = new NodejsFunction(
   {
     ...sharedLambdaProps,
     functionName: 'importProductsFile',
-    entry: 'src/handlers/import-products-file.ts',
+    entry: 'src/handlers/importProductsFile.ts',
   },
 );
 const importFileParser = new NodejsFunction(stack, 'ImportFileParserLambda', {
   ...sharedLambdaProps,
   functionName: 'importFileParser',
-  entry: 'src/handlers/import-file-parser.ts',
+  entry: 'src/handlers/importFileParser.ts',
 });
 
 catalogItemsQueue.grantSendMessages(importFileParser);

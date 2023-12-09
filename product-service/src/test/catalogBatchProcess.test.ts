@@ -1,4 +1,4 @@
-import { handler } from '../handlers/catalog-batch-process';
+import { handler } from '../handlers/catalogBatchProcess';
 import { availableProducts } from '../mocks/data';
 import * as products from '../db/products';
 import snsClient from '../libs/sns';
