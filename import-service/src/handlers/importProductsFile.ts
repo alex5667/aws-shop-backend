@@ -20,7 +20,6 @@ export const handler = async (
     Key: `${Dir.UPLOADED}/${fileName}`,
     ContentType: 'text/csv',
   });
-
   try {
     const url = await getSignedUrl(client, putObjCommand);
     return buildResponse(200, url);
