@@ -84,7 +84,7 @@ new sns.Subscription(stack, 'PrimarySubscription', {
 });
 
 if (process.env.LOW_STOCK_EMAIL) {
-  new sns.Subscription(stack, 'NewLowStockSubscription', {
+  new sns.Subscription(stack, 'LowStockSubscription', {
     endpoint: process.env.LOW_STOCK_EMAIL,
     protocol: sns.SubscriptionProtocol.EMAIL,
     topic: createProductTopic,
