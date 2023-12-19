@@ -14,7 +14,7 @@ Deploys lambda functions to AWS.
 
 ### `cdk:remove`
 
-Removes Product service infrastructure from AWS.
+Removes Import service infrastructure from AWS.
 
 ### `test`
 

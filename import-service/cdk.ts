@@ -69,6 +69,26 @@ const importFileParser = new NodejsFunction(stack, 'ImportFileParserLambda', {
 
 catalogItemsQueue.grantSendMessages(importFileParser);
 
+const basicAuthorizer = lambda.Function.fromFunctionName(
+  stack,
+  'BasicAuthorizerLambda',
+  process.env.AUTHORIZER_LAMBDA_NAME || '',
+);
+const authorizer = new apiGateway.TokenAuthorizer(
+  stack,
+  'ImportServiceAuthorizer',
+  {
+    handler: basicAuthorizer,
+  },
+);
+
+new lambda.CfnPermission(stack, 'BasicAuthorizerInvoke Permissions', {
+  action: 'lambda:InvokeFunction',
+  functionName: basicAuthorizer.functionName,
+  principal: 'apigateway.amazonaws.com',
+  sourceArn: authorizer.authorizerArn,
+});
+
 const api = new apiGateway.RestApi(stack, 'ImportApi', {
   defaultCorsPreflightOptions: {
     allowHeaders: ['*'],
@@ -78,11 +98,23 @@ const api = new apiGateway.RestApi(stack, 'ImportApi', {
 });
 
 bucket.grantReadWrite(importProductsFile);
+
 api.root
   .addResource(API_PATH)
   .addMethod('GET', new apiGateway.LambdaIntegration(importProductsFile), {
     requestParameters: { 'method.request.querystring.name': true },
+    authorizer,
   });
+api.addGatewayResponse('GatewayResponseUnauthorized', {
+  type: apiGateway.ResponseType.UNAUTHORIZED,
+  responseHeaders: {
+    'Access-Control-Allow-Origin': "'*'",
+    'Access-Control-Allow-Headers': "'*'",
+    'Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE'",
+    'Access-Control-Allow-Credentials': "'true'",
+  },
+});
+
 bucket.grantReadWrite(importFileParser);
 bucket.grantDelete(importFileParser);
 bucket.addEventNotification(
@@ -90,3 +122,7 @@ bucket.addEventNotification(
   new s3notifications.LambdaDestination(importFileParser),
   { prefix: Dir.UPLOADED },
 );
+
+new cdk.CfnOutput(stack, 'AuthorizerArn', {
+  value: authorizer.authorizerArn,
+});
