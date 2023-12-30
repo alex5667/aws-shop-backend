@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "scripts": {
     "test": "jest",
-    "cdk:bootstrap": "npx cdk bootstrap",
-    "cdk:deploy": "npx cdk deploy",
-    "cdk:remove": "npx cdk destroy",
+    "cdk:bootstrap": "npx cdk bootstrap --profile myprofile",
+    "cdk:deploy": "npx cdk deploy --profile myprofile",
+    "cdk:remove": "npx cdk destroy --profile myprofile",
     "lint": "eslint --ignore-path .gitignore --fix src",
     "prettier": "prettier src --write"
   },
