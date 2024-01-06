@@ -1,16 +1,14 @@
-# The 'node_modules' folder is created during the 'dependencies' stage, so no copying is required
+#This folder will be created on the 'dependencies' stage so no copying is required
 node_modules
-
-# The 'dist' folder is created during the 'build' stage, so no copying is required
+#This folder will be created on the 'build' stage so no copying is required
 dist
 
-# Folders and files not required in the production version
+#Folders and files are not required in production version
 cdk.out
 scripts
 **/**/*.spec.ts
 test
-
-# Exclude files that shouldn't be copied to the image, even in local builds
+# .envfile shouldn't been copied to image even in local build
 .env* 
 .eslint.js
 .pritierrc
@@ -19,7 +17,6 @@ Dockerfile
 .elasticbeanstalk
 .ebextensions
 README.md
-
-# Git-related data is not required inside the image
+# git related data is not required inside the image
 .gitignore
 .git
